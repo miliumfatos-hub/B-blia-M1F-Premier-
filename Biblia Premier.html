@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bíblia Premier</title>
+<style>
+:root { 
+  --font-size: 18px; 
+  --max-width: 650px; 
+  --gold-premier: linear-gradient(135deg, #ffe17d 0%, #ffd700 50%, #b39200 100%);
+  --gold-text: #ffd700;
+}
+
+/* SISTEMA DE TEMAS AVANÇADO */
+[data-theme="wood"] {
+  --bg-body: #140b00;
+  --bg-panel: linear-gradient(180deg, #2d1a04 0%, #1a0f00 50%, #140b00 100%);
+  --bg-header: #2d1a04;
+  --bg-card: #3a2206;
+  --border: #8b6914;
+  --accent: #ffd700;
+  --accent-glow: 0 0 10px #ffd70055;
+  --text-color: #ffe17d;
+  --clock-bg: #0d0600;
+  --clock-text: #ff9900;
+  --clock-border: #8b6914;
+}
+[data-theme="neon"] {
+  --bg-body: #0d0101;
+  --bg-panel: linear-gradient(180deg, #260505 0%, #140202 50%, #0d0101 100%);
+  --bg-header: #260505;
+  --bg-card: #3d0a0a;
+  --border: #ff0044;
+  --accent: #ffd700;
+  --accent-glow: 0 0 15px #ff0044cc;
+  --text-color: #ffffff;
+  --clock-bg: #000000;
+  --clock-text: #ff0044;
+  --clock-border: #ff0044;
+}
+[data-theme="blue-neon"] {
+  --bg-body: #020b1e;
+  --bg-panel: linear-gradient(180deg, #091e50 0%, #040f2b 50%, #020b1e 100%);
+  --bg-header: #091e50;
+  --bg-card: #0f2d75;
+  --border: #2563eb;
+  --accent: #ffd700;
+  --accent-glow: 0 0 18px #2563ebf0;
+  --text-color: #ffffff;
+  --clock-bg: #010614;
+  --clock-text: #3b82f6;
+  --clock-border: #2563eb;
+}
+[data-theme="mono"] {
+  --bg-body: #121212;
+  --bg-panel: #1a1a1a;
+  --bg-header: #1a1a1a;
+  --bg-card: #262626;
+  --border: #ffffff;
+  --accent: #ffd700;
+  --accent-glow: 0 0 8px #ffffff44;
+  --text-color: #ffffff;
+  --clock-bg: #000000;
+  --clock-text: #ffffff;
+  --clock-border: #ffffff;
+}
+[data-theme="papiro"] {
+  --bg-body: #d9c596;
+  --bg-panel: linear-gradient(160deg, #e8d5a3 60%, #c9a560);
+  --bg-header: #e8d5a3;
+  --bg-card: #efe0b5;
+  --border: #704d11;
+  --accent: #ffd700;
+  --accent-glow: 0 1px 4px rgba(0,0,0,0.4);
+  --text-color: #3b2200;
+  --clock-bg: #efe0b5;
+  --clock-text: #5a3000;
+  --clock-border: #704d11;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:Georgia,serif;background-color:var(--bg-body);color:var(--text-color);transition:0.3s;overflow:hidden;}
+button{cursor:pointer; transition:0.2s; border:none;} button:active{opacity:0.6;}
+
+/* SPLASH SCREEN */
+#splash-screen{height:100vh;background:var(--bg-panel);display:flex;align-items:center;justify-content:center;padding:20px;position:fixed;inset:0;z-index:9999;overflow-y:auto;}
+.splash-inner{text-align:center;max-width:var(--max-width);width:100%;padding:10px 0;}
+.splash-logo{font-size:75px;color:var(--gold-text);text-shadow: 0 2px 10px rgba(0,0,0,0.5);margin-bottom:5px;}
+.splash-title {
+  font-size:36px;
+  font-weight:bold;
+  margin-bottom:25px;
+  background: var(--gold-premier);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 2px;
+}
+.splash-buttons{display:flex;flex-direction:column;gap:12px;}
+.splash-btn{background:var(--bg-card);color:var(--text-color);border:1px solid var(--border);padding:16px;border-radius:10px;font-weight:bold;box-shadow:var(--accent-glow);font-size:16px;text-transform:uppercase;display:block;width:100%;}
+.splash-btn-prime{background: var(--gold-premier) !important; color: #000 !important; font-size:18px !important; border:none !important;}
+
+/* ALERTAS VISUAIS INICIAIS */
+.alert-box { border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; font-size: 14px; text-align: left; line-height: 1.5; border: 1px solid transparent; display:none; }
+.alert-success { background-color: rgba(13, 49, 23, 0.95); border-color: #28a745; color: #fff; }
+.alert-warning { background-color: rgba(61, 48, 5, 0.95); border-color: #ffc107; color: #fff; }
+
+/* PAINEL PRINCIPAL */
+#app-main {
+  display: none; 
+  flex-direction: column; 
+  height: 100vh; 
+  max-width: var(--max-width); 
+  margin: 0 auto; 
+  border: 3px solid var(--border); 
+  background: var(--bg-panel); 
+  position: relative;
+  box-shadow: var(--accent-glow);
+}
+
+/* HEADER */
+header {
+  background: var(--bg-header);
+  border-bottom: 2px solid var(--border);
+  padding: 12px;
+  z-index: 9000;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+  flex-shrink: 0;
+}
+.header-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:10px; width:100%;}
+
+.header-logo {
+  font-weight:900; 
+  background: var(--gold-premier);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size:22px; 
+  letter-spacing:1px; 
+  white-space:nowrap; 
+  flex-shrink:0;
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.8));
+}
+
+.clock-box {
+  font-family:'Courier New', monospace; 
+  font-size:12px; 
+  font-weight: bold;
+  color: var(--clock-text); 
+  border: 2px solid var(--clock-border); 
+  padding: 6px 10px; 
+  border-radius: 4px; 
+  background: var(--clock-bg); 
+  text-align: center; 
+  line-height: 1.3; 
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.9), 0 0 6px var(--clock-text);
+  white-space: nowrap; 
+  flex-shrink: 0;
+}
+
+/* Ajuste Premier: somente a cor do texto da data e hora, em todos os temas. */
+.clock-box {
+  color: #ffd700 !important;
+  text-shadow: 0 0 5px #ffd700, 0 0 12px rgba(255, 215, 0, 0.85);
+}
+
+/* SELETORES */
+.selectors-trio { display: flex; gap: 8px; margin-bottom: 8px; }
+.selectors-trio select { background:var(--bg-card);color:var(--text-color);border:1px solid var(--border);padding:10px;border-radius:6px;flex:1;font-size:13px; outline:none; font-weight:bold; width: 33%; }
+
+/* TOOLBOX ROLÁVEL COM SETAS INTERATIVAS */
+.scroll-tools-wrapper { position: relative; display: flex; align-items: center; background: rgba(0,0,0,0.25); border-radius: 8px; padding: 0 2px; border: 1px solid var(--border); }
+.scroll-arrow-btn { background: none; color: var(--gold-text); font-size: 16px; padding: 10px; font-weight: bold; z-index: 10; text-shadow: 0 0 5px #000; }
+.scroll-tools { display: flex; overflow-x: auto; white-space: nowrap; gap: 8px; padding: 8px 2px; scroll-behavior: smooth; flex: 1; -webkit-overflow-scrolling: touch; }
+.scroll-tools::-webkit-scrollbar { display: none; }
+.theme-dots{display:flex;gap:5px; align-items:center; margin-right:4px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: 6px;}
+.dot{width:20px;height:20px;border-radius:50%;border:1px solid #fff; cursor:pointer;}
+.tool-btn{background:var(--bg-card);color:var(--text-color);border:1px solid var(--border);padding:8px 12px;border-radius:6px;font-size:14px; flex-shrink:0; font-weight:bold;}
+
+/* ÁREA DE LEITURA */
+#content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px 15px 30px;
+  scroll-behavior: smooth; 
+  background: rgba(0,0,0,0.15);
+}
+.section{display:none;} .section.active{display:block;}
+.verse-block{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06); align-items:flex-start;}
+.verse-num{color:var(--gold-text);font-weight:bold;min-width:30px;font-size:0.9em;text-align:right; margin-top:2px; text-shadow: 0 1px 2px #000;}
+.verse-text{flex:1;line-height:1.8;font-size:var(--font-size);text-indent:1.5em; color: var(--text-color); text-align:justify;}
+
+/* BOTÃO VOLTAR */
+.back-to-reader-container { margin-bottom: 15px; }
+.btn-return-global { width: 100%; background: var(--bg-card); color: var(--gold-text); border: 1px solid var(--border); padding: 12px; border-radius: 8px; font-weight: bold; text-align: left; font-size: 14px; box-shadow: var(--accent-glow); }
+
+/* BUSCA RETRÁTIL */
+#search-bar { display:none; background:var(--bg-card); padding:12px; border-bottom:2px solid var(--border); gap:8px; animation: slideDown 0.2s ease-out; }
+@keyframes slideDown { from{transform:translateY(-10px); opacity:0;} to{transform:translateY(0); opacity:1;} }
+#search-bar input{flex:1;padding:12px;border-radius:6px;border:1px solid var(--border);background:var(--bg-body);color:var(--text-color); outline:none; font-size:15px;}
+
+.card{background:var(--bg-card);border:1px solid var(--border);padding:16px;border-radius:12px;margin-bottom:15px; color: var(--text-color); line-height:1.6;}
+.fav-actions{display:flex;gap:10px;margin-top:12px;}
+.action-btn{flex:1;padding:10px;border-radius:6px;border:1px solid var(--border);background:var(--bg-body);color:var(--text-color);font-size:13px;display:flex;align-items:center;justify-content:center;gap:5px;font-weight:bold;}
+
+/* BOTÕES FLUTUANTES */
+.float-btn{position:fixed;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 15px rgba(0,0,0,0.7);z-index:1000; cursor:pointer;}
+.btn-home{bottom:115px; left:calc(50% - var(--max-width)/2 + 20px); background:var(--gold-premier); color:#000; border:none;}
+.btn-top{bottom:115px; right:calc(50% - var(--max-width)/2 + 20px); background:var(--bg-card); color:var(--gold-text); border:1px solid var(--border);}
+@media(max-width:650px){ .btn-home{left:15px;} .btn-top{right:15px;} }
+
+/* RODAPÉ CALIBRADO EM ALTURA PARA CHROME MOBILE */
+footer {
+  flex-shrink: 0;
+  height: 96px; /* Altura aumentada para empurrar os componentes para cima */
+  background: var(--bg-header);
+  border-top: 2px solid var(--border);
+  display: flex;
+  align-items: flex-start; /* Alinhamento no topo do footer */
+  justify-content: space-between;
+  padding: 12px 10px 0 10px; /* Margem interna superior dá o respiro na base */
+  box-shadow: 0 -4px 15px rgba(0,0,0,0.4);
+  z-index: 9500;
+  overflow: hidden;
+}
+.footer-nav-btn {
+  background: var(--bg-card);
+  color: var(--text-color);
+  border: 1px solid var(--border);
+  height: 52px;
+  width: 22%;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-shadow: var(--accent-glow);
+}
+
+/* CONTAINER CENTRAL ALINHADO */
+.footer-middle-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 52px; /* Pareado perfeitamente com os botões laterais */
+  width: 54%;
+}
+.embedded-bar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 0 8px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.9), var(--accent-glow);
+}
+.embedded-bar button {
+  padding: 4px 6px;
+  font-size: 15px;
+  background: transparent;
+  color: #fff;
+}
+
+/* MODAL DESIGN */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:10000;padding:15px;}
+.modal-box{background:#111111; border-radius:16px; max-width:460px; width:100%; max-height:85vh; overflow-y:auto; color: #ffffff;}
+
+.modal-box[data-alert="red"] { border: 3px solid #ff0044; box-shadow: 0 0 20px #ff0044; }
+.modal-box[data-alert="green"] { border: 3px solid #00ff66; box-shadow: 0 0 20px #00ff66; }
+.modal-box[data-alert="blue"] { border: 3px solid #2563eb; box-shadow: 0 0 20px #2563eb; }
+
+.modal-header-alert { font-size: 20px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.modal-box[data-alert="red"] .modal-header-alert { color: #ff0044; }
+.modal-box[data-alert="green"] .modal-header-alert { color: #00ff66; }
+.modal-box[data-alert="blue"] .modal-header-alert { color: #3b82f6; }
+
+.modal-body-text { font-size: 15px; line-height: 1.6; margin-bottom: 20px; color: #e0e0e0; }
+.modal-footer-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.modal-action-btn { padding: 12px 20px; border-radius: 8px; font-weight: bold; font-size: 14px; }
+.btn-confirm-red { background: #ff0044; color: #fff; }
+.btn-confirm-green { background: #00ff66; color: #000; }
+.btn-confirm-blue { background: #2563eb; color: #fff; width:100%; text-align:center; }
+.btn-deny-generic { background: #222; color: #aaa; border: 1px solid #444; }
+
+.social-btn{display:inline-block; padding:12px; border-radius:8px; text-decoration:none; margin-top:8px; font-weight:bold; color:#fff; text-align:center; font-size:14px;}
+.yt{background:#ff0000;} .ig{background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);} .bio{background:#1e40af; border: 1px solid #3b82f6;}
+
+/* ARTE DO BRASÃO */
+.logo-wrapper { 
+  width: 120px; 
+  height: 120px; 
+  margin: 0 auto 15px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: radial-gradient(circle, #2d1a04 0%, #0f0700 100%); 
+  border-radius: 50%; 
+  border: 4px double #ffd700; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.9), inset 0 0 15px rgba(0,0,0,0.8);
+  overflow: hidden; 
+  position: relative;
+}
+.logo-img { width: 100%; height: 100%; object-fit: cover; }
+.fallback-logo-art {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+}
+.fallback-m1f {
+  font-family: 'Arial Black', sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #ffe17d 0%, #ffd700 50%, #b39200 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
+  filter: drop-shadow(0px 2px 3px rgba(0,0,0,0.9));
+}
+.fallback-sub {
+  font-size: 9px;
+  text-transform: uppercase;
+  color: #ffe17d;
+  letter-spacing: 2px;
+  margin-top: -2px;
+  font-weight: bold;
+}
+
+.plan-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.plan-row input { width: 20px; height: 20px; accent-color: var(--border); }
+.p-bar-bg { background: rgba(0,0,0,0.4); border-radius: 8px; height: 8px; width: 100%; margin: 6px 0 12px 0; border: 1px solid var(--border); overflow: hidden; }
+.p-bar-fill { background: var(--border); height: 100%; width: 0%; transition: 0.3s; }
+
+
+/* UPGRADE: ESTUDOS E FRASES DE JESUS */
+.study-toolbar { display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap; }
+.study-toolbar button { flex:1; min-width:130px; }
+.study-card { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:16px; margin-bottom:14px; box-shadow:var(--accent-glow); }
+.study-card h4 { color:var(--gold-text); margin-bottom:8px; }
+.study-date { font-size:12px; opacity:.65; margin-bottom:10px; }
+.handwriting { width:100%; min-height:150px; resize:vertical; background:#fff8df; color:#241500; border:2px solid var(--border); border-radius:10px; padding:14px; font-family:'Segoe Print','Bradley Hand','Comic Sans MS',cursive; font-size:19px; line-height:1.55; outline:none; }
+.comment-box { width:100%; min-height:120px; resize:vertical; background:rgba(0,0,0,.25); color:var(--text-color); border:1px solid var(--border); border-radius:10px; padding:12px; font-family:Georgia,serif; font-size:16px; line-height:1.5; outline:none; }
+.neon-action { background:var(--bg-body); color:var(--gold-text); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-weight:bold; box-shadow:var(--accent-glow); }
+.neon-action.danger { color:#ff5577; border-color:#ff0044; }
+.empty-state { opacity:.7; padding:12px 0; }
+.app-signature { text-align:center; margin-top:22px; padding:12px 8px 4px; color:#e6e6e6; text-shadow:0 0 5px #fff, 0 0 10px #d4af37; font-weight:bold; font-size:16px; }
+.app-signature small { display:block; margin-top:4px; color:#d4af37; text-shadow:0 0 5px #ffd700; font-size:11px; font-weight:normal; }
+</style>
+</head>
+<body data-theme="wood">
+
+<div id="splash-screen">
+  <div class="splash-inner">
+    <div class="splash-logo">📖</div>
+    <h1 class="splash-title">BÍBLIA PREMIER</h1>
+    
+    <div id="alert-success-box" class="alert-box alert-success">
+      <b>✅ SISTEMA PRONTO:</b> Mapeamento de dados ativo no Motor Premier Corporativo.
+    </div>
+    <div id="alert-warning-box" class="alert-box alert-warning">
+      <b>⚠️ AGUARDANDO ESTRUTURA:</b> Nenhum JSON detectado. Use a ferramenta abaixo ou inicie a demonstração.
+    </div>
+
+    <div class="splash-buttons">
+      <button class="splash-btn splash-btn-prime" onclick="initApp()">▶ INICIAR LEITURA</button>
+      <button class="splash-btn" onclick="triggerJsonLoad()">📂 CARREGAR BÍBLIA JSON</button>
+      <button class="splash-btn" onclick="showFullManual()">📖 MANUAL OPERACIONAL</button>
+      <button class="splash-btn" onclick="openAboutModal()">🙌 MILIUMFATOS</button>
+      <button class="splash-btn" onclick="triggerResetSystem()">⚠️ REDEFINIR SISTEMA</button>
+      <button class="splash-btn" onclick="clearTemporaryData()">🧹 LIMPAR CACHE DO APP</button>
+      <input type="file" id="json-file-input" accept=".json" style="display:none" onchange="loadBibleJSON(this)" />
+    </div>
+    <div class="app-signature">by François Geomar<small>um oferecimento Zapia AI &amp; @miliumfatos</small></div>
+  </div>
+</div>
+
+<div id="app-main">
+  <header>
+    <div class="header-row">
+      <div class="header-logo">BÍBLIA PREMIER</div>
+      <div id="hclock" class="clock-box">--/--/----<br>00:00:00</div>
+    </div>
+    
+    <div class="selectors-trio">
+      <select id="sel-book" onchange="onBookChange()"></select>
+      <select id="sel-chapter" onchange="onChapterChange()"></select>
+      <select id="sel-verse" onchange="onVerseSelectorChange()"></select>
+    </div>
+
+    <div class="scroll-tools-wrapper">
+      <button class="scroll-arrow-btn" onclick="scrollToolbox(-80)">❮</button>
+      <div class="scroll-tools" id="toolbox-slider">
+        <button class="tool-btn" onclick="toggleSearch()">🔍 Busca</button>
+        <button class="tool-btn" onclick="showFavorites()">❤️ Favoritos</button>
+        <button class="tool-btn" onclick="showDevotional()">📅 Devocional</button>
+        <button class="tool-btn" onclick="showSection('section-plans')">📋 Planos</button>
+        <button class="tool-btn" onclick="showStudySection()">✍️ Estudos</button>
+        <button class="tool-btn" onclick="showJesusSection()">✝️ Jesus</button>
+        <button class="tool-btn" onclick="showHistorySection()">📚 Histórico</button>
+        <button class="tool-btn" id="btn-narrator" onclick="toggleNarrator()">🔊 Áudio</button>
+        <button class="tool-btn" onclick="toggleEmbeddedTeleprompter()">📜 Scroll</button>
+        <button class="tool-btn" onclick="toggleEmbeddedChrono()">⏱️ Tempo</button>
+        <div class="theme-dots">
+          <div class="dot" style="background:#2d1a04;" title="Madeira" onclick="setTheme('wood')"></div>
+          <div class="dot" style="background:#ff0044;" title="Vermelho Neon" onclick="setTheme('neon')"></div>
+          <div class="dot" style="background:#2563eb;" title="Azul Royal Neon" onclick="setTheme('blue-neon')"></div>
+          <div class="dot" style="background:#444444;" title="Monocromático" onclick="setTheme('mono')"></div>
+          <div class="dot" style="background:#d9c596;" title="Pergaminho" onclick="setTheme('papiro')"></div>
+        </div>
+        <button class="tool-btn" onclick="changeFontSize(-1)">A-</button>
+        <button class="tool-btn" onclick="changeFontSize(1)">A+</button>
+      </div>
+      <button class="scroll-arrow-btn" onclick="scrollToolbox(80)">❯</button>
+    </div>
+  </header>
+
+  <div id="search-bar">
+    <input type="text" id="search-input" placeholder="O que deseja buscar? (Pressione Enter)" onkeydown="if(event.key==='Enter'){doSearch();this.blur();}">
+    <button class="tool-btn" onclick="closeSearch()">✕</button>
+  </div>
+
+  <main id="content-area">
+    <div id="section-reader" class="section active">
+      <div id="reader-title" style="text-align:center; font-weight:bold; margin-bottom:15px; color:var(--gold-text); font-size:1.3em; text-shadow: 0 2px 4px #000;"></div>
+      <div id="reader-body"></div>
+    </div>
+
+    <div id="section-search" class="section">
+      <div class="back-to-reader-container">
+        <button class="btn-return-global" onclick="showSection('section-reader')">⬅ Voltar para a Leitura</button>
+      </div>
+      <h3 style="color:var(--gold-text); margin-bottom:15px;">🔍 Ocorrências Encontradas</h3>
+      <div id="search-results"></div>
+    </div>
+
+    <div id="section-favs" class="section">
+      <div class="back-to-reader-container">
+        <button class="btn-return-global" onclick="showSection('section-reader')">⬅ Voltar para a Leitura</button>
+      </div>
+      <h3 style="color:var(--gold-text); margin-bottom:15px;">❤️ Meus Versículos Salvos</h3>
+      <div id="favs-list"></div>
+    </div>
+
+    <div id="section-history" class="section">
+      <div class="back-to-reader-container">
+        <button class="btn-return-global" onclick="showSection('section-reader')">⬅ Voltar para a Leitura</button>
+      </div>
+      <h3 style="color:var(--gold-text); margin-bottom:15px;">📚 Histórico Recente de Navegação</h3>
+      <div id="history-list"></div>
+    </div>
+
+    <div id="section-devotional" class="section">
+      <div class="back-to-reader-container">
+        <button class="btn-return-global" onclick="showSection('section-reader')">⬅ Voltar para a Leitura</button>
+      </div>
+      <h3 style="color:var(--gold-text); margin-bottom:15px;">📅 Alimento Diário</h3>
+      <div id="devotional-content"></div>
+    </div>
+
+    <div id="section-studies" class="section">
+      <div class="back-to-reader-container"><button class="btn-return-global" onclick="showSection('section-reader')">⬅ Voltar para a Leitura</button></div>
+      <h3 style="color:var(--gold-text); margin-bottom:15px;">✍️ Estudos e Anotações</h3>
+      <div class="study-card">
+        <h4>Nova anotação</h4>
+        <input id="study-title" class="comment-box" style="min-height:48px; margin-bottom:10px;" placeholder="Título do estudo (opcional)">
+        <textarea id="study-note" class="handwriting" placeholder="Escreva seu entendimento, observações e aplicações..."></textarea>
+        <div class="study-toolbar" style="margin-top:10px;">
+          <button class="neon-action" onclick="saveStudyNote()">💾 Gravar</button>
+          <button class="neon-action danger" onclick="cancelStudyNote()">❌ Cancelar</button>
+        </div>
+      </div>
+      <div id="study-list"></div>
+    </div>
+
+    <div id="section-jesus" class="section">
+      <div class="back-to-reader-container"><button class="btn-return-global" onclick="showSection('section-reader')">⬅ Voltar para a Leitura</button></div>
+      <h3 style="color:var(--gold-text); margin-bottom:15px;">✝️ Frases e Parábolas de Jesus</h3>
+      <div id="jesus-list"></div>
+    </div>
+
+    <div id="section-plans" class="section">
+      <div class="back-to-reader-container">
+        <button class="btn-return-global" onclick="showSection('section-reader')">⬅ Voltar para a Leitura</button>
+      </div>
+      <h3 style="color:var(--gold-text); margin-bottom:15px;">📋 Metas e Progresso</h3>
+      <div class="card">
+        <h4>Plano Cronológico Anual</h4>
+        <div class="p-bar-bg"><div id="p-fill-1" class="p-bar-fill"></div></div>
+        <div id="plan-container-1" style="max-height:150px; overflow-y:auto;"></div>
+      </div>
+      <div class="card">
+        <h4>Plano Intensivo de 90 Dias</h4>
+        <div class="p-bar-bg"><div id="p-fill-2" class="p-bar-fill"></div></div>
+        <div id="plan-container-2" style="max-height:150px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </main>
+
+  <button type="button" class="float-btn btn-home" id="btn-home" onclick="goHome(event)">🏠</button>
+  <div class="float-btn btn-top" onclick="scrollToTop()">⬆️</div>
+
+  <footer>
+    <button class="footer-nav-btn" onclick="navigateChapter(-1)">◀ Voltar</button>
+    
+    <div class="footer-middle-container">
+      <div id="embedded-tp-bar" class="embedded-bar">
+        <button onclick="tpSlower()">🐢</button>
+        <span id="tp-speed-label" style="font-size:12px; font-weight:bold; color:#fff;">V: 1</span>
+        <button onclick="tpFaster()">🐇</button>
+        <button id="tp-play-btn" style="color:var(--gold-text); font-weight:900;" onclick="toggleTp()">▶</button>
+      </div>
+
+      <div id="embedded-chrono-bar" class="embedded-bar">
+        <span id="chrono-display" style="font-family:monospace; font-size:15px; font-weight:bold; color:#00ff66;">00:00</span>
+        <div style="display:flex; gap:2px;">
+          <button style="color:#00ff66;" onclick="startChrono()">▶</button>
+          <button style="color:#ffc107;" onclick="pauseChrono()">⏸</button>
+          <button style="color:#ff0044;" onclick="resetChrono()">↺</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="footer-nav-btn" onclick="navigateChapter(1)">Avançar ▶</button>
+  </footer>
+</div>
+
+<div id="global-alert-modal" class="modal-overlay">
+  <div class="modal-box" id="modal-box-style" data-alert="blue">
+    <div style="padding: 22px;">
+      <div class="modal-header-alert" id="modal-alert-title">📢 Título</div>
+      <div class="modal-body-text" id="modal-alert-body">Conteúdo descritivo.</div>
+      <div class="modal-footer-actions" id="modal-actions-container">
+        <button class="modal-action-btn btn-deny-generic" id="btn-modal-deny" onclick="closeInteractiveAlert(false)">Negar</button>
+        <button class="modal-action-btn" id="btn-modal-confirm" onclick="closeInteractiveAlert(true)">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-about" class="modal-overlay" onclick="if(event.target===this) document.getElementById('modal-about').style.display='none';">
+  <div class="modal-box" data-alert="blue" style="border-color: var(--border); box-shadow: var(--accent-glow);">
+    <div style="padding: 22px;">
+      <div class="modal-header-alert" style="color:var(--gold-text); justify-content:center;">🙌 Canal MiliumFatos</div>
+      
+      <div class="logo-wrapper">
+        <img src="logo.png" alt="MiliumFatos Logo" class="logo-img" id="main-logo-target" onerror="handleLogoError()">
+        <div class="fallback-logo-art" id="fallback-logo-art">
+          <div class="fallback-m1f">M1F</div>
+          <div class="fallback-sub">Produções</div>
+        </div>
+      </div>
+
+      <div class="modal-body-text" style="text-align:center;">
+        Buscamos mistérios profundos, neurociência, comportamento e espiritualidade prática. Inscreva-se em nossas redes e faça parte dessa egrégora de conhecimento.
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <a href="https://site.zapia.com/5g5gz9gc" target="_blank" class="social-btn bio">🔗 Link da Bio Oficial</a>
+        <a href="https://m.youtube.com/results?sp=mAEA&search_query=Miliumfatos+?sub_confimation=1" target="_blank" class="social-btn yt">YouTube Oficial</a>
+        <a href="https://www.instagram.com/miliumfatos?igsh=ODk1ejlxNmpjMjlu" target="_blank" class="social-btn ig">Instagram</a>
+      </div>
+      <button class="splash-btn" style="width:100%; margin-top:15px; border-color:var(--border);" onclick="document.getElementById('modal-about').style.display='none';">Voltar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+var bibleData=null, currentBook=0, currentChap=0, narratorOn=false, narratorUtterance=null, ttsVoices=[], ttsQueue=[], ttsIndex=0;
+var KEY_DATA='M1F_PREMIER_DATA_V4', KEY_THEME='M1F_PREMIER_THEME_V4', KEY_FAV='M1F_PREMIER_FAVS_V4', KEY_HISTORY='M1F_PREMIER_HIST_V4', KEY_PLANS='M1F_PREMIER_PLANS_V4';
+
+var DEVOTIONALS = [
+  {ref:"Salmos 23:1", txt:"O Senhor é o meu pastor; nada me faltará.", refl:"A quietude interna se manifesta na certeza de que o amparo universal opera a seu favor."},
+  {ref:"Filipenses 4:13", txt:"Posso tudo naquele que me fortalece.", refl:"Sua resiliência espiritual ultrapassa as barreiras da limitação mental do cotidiano."},
+  {ref:"Provérbios 4:23", txt:"Guarde o seu coração, pois dele procedem as fontes da vida.", refl:"Filtre estritamente o que entra na sua mente; seus pensamentos geram a sua realidade."}
+];
+
+var mockupBible = { books: [{ name: "Demonstração (Premier)", chapters: [{ verses: ["Nenhum banco de dados proprietário foi carregado.", "Importe o seu arquivo bíblico estruturado in JSON na tela inicial para liberar o indexador.", "Explore as sub-abas horizontais de ferramentas para inspecionar os recursos operacionais de apoio."] }] }] };
+var activeAlertCallback = null;
+
+window.addEventListener('DOMContentLoaded', function(){
+  var theme = localStorage.getItem(KEY_THEME) || 'wood';
+  setTheme(theme);
+  startClock();
+  initPlanSystem();
+  refreshAlertZone();
+  initTTS();
+});
+
+function handleLogoError() {
+  document.getElementById('main-logo-target').style.display = 'none';
+  document.getElementById('fallback-logo-art').style.display = 'flex';
+}
+
+function refreshAlertZone(){
+  var successBox = document.getElementById('alert-success-box');
+  var warningBox = document.getElementById('alert-warning-box');
+  var saved = localStorage.getItem(KEY_DATA);
+  if(saved){
+    try {
+      bibleData = JSON.parse(saved);
+      successBox.style.display = 'block';
+      warningBox.style.display = 'none';
+    } catch(e) { 
+      localStorage.removeItem(KEY_DATA);
+      showWarning(successBox, warningBox);
+    }
+  } else { showWarning(successBox, warningBox); }
+}
+
+function showWarning(s, w){ s.style.display = 'none'; w.style.display = 'block'; if(!bibleData) bibleData = mockupBible; }
+
+function goHome(event){
+  if(event){ event.preventDefault(); event.stopPropagation(); }
+  stopNavigatorAddons();
+  document.getElementById('app-main').style.display='none';
+  document.getElementById('splash-screen').style.display='flex';
+  refreshAlertZone();
+}
+
+function triggerJsonLoad(){ document.getElementById('json-file-input').click(); }
+
+function loadBibleJSON(input){
+  var file=input.files[0]; if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try {
+      var parsedJson = JSON.parse(e.target.result);
+      var normalizedBooks = [];
+      function isStringArray(arr) { return Array.isArray(arr) && arr.length > 0 && arr.every(x => typeof x === 'string' || typeof x === 'number'); }
+      
+      function extractChaptersFromNode(node) {
+        var chaptersFound = [];
+        if (Array.isArray(node)) {
+          node.forEach(function(subNode) {
+            if (isStringArray(subNode)) { chaptersFound.push({ verses: subNode.map(String) }); } 
+            else if (subNode && typeof subNode === 'object') {
+              var possibleVerses = subNode.verses || subNode.versiculos || subNode.text || subNode.texto;
+              if (isStringArray(possibleVerses)) { chaptersFound.push({ verses: possibleVerses.map(String) }); return; }
+              if (Array.isArray(possibleVerses)) {
+                var testExtract = possibleVerses.map(v => typeof v === 'object' ? (v.text || v.texto || Object.values(v)[0]) : v);
+                if (testExtract.length) { chaptersFound.push({ verses: testExtract.map(String) }); return; }
+              }
+              if (typeof subNode.text === 'string') chaptersFound.push({ verses: [subNode.text] });
+              else if (typeof subNode.texto === 'string') chaptersFound.push({ verses: [subNode.texto] });
+            }
+          });
+        } else if (node && typeof node === 'object') {
+          var keys = Object.keys(node);
+          if (keys.every(k => !isNaN(k))) {
+            keys.sort((a,b) => parseInt(a) - parseInt(b)).forEach(function(k) {
+              var chNode = node[k];
+              if (isStringArray(chNode)) { chaptersFound.push({ verses: chNode.map(String) }); } 
+              else if (Array.isArray(chNode)) {
+                var extracted = chNode.map(v => (v && typeof v === 'object') ? (v.text || v.texto || Object.values(v)[0]) : v).filter(Boolean);
+                if (extracted.length) chaptersFound.push({ verses: extracted.map(String) });
+              }
+            });
+          } else {
+            var possibleChaps = node.chapters || node.capitulos || node.verses;
+            if (possibleChaps) return extractChaptersFromNode(possibleChaps);
+          }
+        }
+        return chaptersFound;
+      }
+
+      var booksRoot = Array.isArray(parsedJson) ? parsedJson : (parsedJson.books || parsedJson.livros || parsedJson.data || null);
+      if (!booksRoot && parsedJson && typeof parsedJson === 'object') {
+        booksRoot = [];
+        Object.keys(parsedJson).forEach(function(key) {
+          var item = parsedJson[key];
+          if (item && typeof item === 'object') {
+            if (!item.name && !item.nome) item.name = key;
+            booksRoot.push(item);
+          }
+        });
+      }
+
+      if (!booksRoot || !Array.isArray(booksRoot)) { throw new Error(); }
+
+      booksRoot.forEach(function(bookItem, bIdx) {
+        if (!bookItem || typeof bookItem !== 'object') return;
+        var name = bookItem.name || bookItem.nome || bookItem.title || bookItem.label || bookItem.abbrev || ("Livro " + (bIdx + 1));
+        var chapsData = bookItem.chapters || bookItem.capitulos || bookItem.text || bookItem.texto || bookItem.verses || bookItem;
+        var chaptersList = extractChaptersFromNode(chapsData);
+        if (chaptersList && chaptersList.length > 0) { normalizedBooks.push({ name: String(name), chapters: chaptersList }); }
+      });
+
+      if (!normalizedBooks.length) { throw new Error(); }
+      bibleData = { books: normalizedBooks };
+      localStorage.setItem(KEY_DATA, JSON.stringify(bibleData));
+      
+      openInteractiveAlert('green', 'Sucesso Operacional', 'Banco de dados acoplado com êxito! ' + normalizedBooks.length + ' livros assimilados.', function(){ refreshAlertZone(); }, null, false);
+    } catch(err){ openInteractiveAlert('red', 'Falha na Estrutura', 'O arquivo fornecido não atende aos requisitos estruturados.', null, null, false); }
+  };
+  reader.readAsText(file);
+}
+
+function initApp(){
+  document.getElementById('splash-screen').style.display='none';
+  document.getElementById('app-main').style.display='flex';
+  buildSelects(); buildPlansInterface(); showSection('section-reader');
+}
+
+function buildSelects(){
+  var b = document.getElementById('sel-book'); b.innerHTML='';
+  bibleData.books.forEach(function(l,i){ b.options.add(new Option(l.name, i)); });
+  b.value = currentBook;
+  buildChapters();
+}
+
+function buildChapters(){
+  var c = document.getElementById('sel-chapter'); c.innerHTML='';
+  var targetBook = bibleData.books[currentBook] || bibleData.books[0];
+  targetBook.chapters.forEach(function(_,i){ c.options.add(new Option('Capítulo '+(i+1), i)); });
+  c.value = currentChap;
+  buildVersesSelector();
+}
+
+function buildVersesSelector(){
+  var vSel = document.getElementById('sel-verse'); vSel.innerHTML='';
+  vSel.options.add(new Option('(VERSÍCULOS)', ''));
+  var targetBook = bibleData.books[currentBook] || bibleData.books[0];
+  var chap = targetBook.chapters[currentChap];
+  if(chap && chap.verses){ chap.verses.forEach(function(_,i){ vSel.options.add(new Option('Verso '+(i+1), i)); }); }
+}
+
+function onBookChange(){ currentBook=parseInt(document.getElementById('sel-book').value); currentChap=0; buildChapters(); renderChapter(); }
+function onChapterChange(){ currentChap=parseInt(document.getElementById('sel-chapter').value); buildVersesSelector(); renderChapter(); }
+function onVerseSelectorChange(){
+  var val = document.getElementById('sel-verse').value;
+  if(val !== '') { var el = document.getElementById('v-'+val); if(el) el.scrollIntoView({behavior:'smooth', block:'center'}); }
+}
+
+function navigateChapter(dir) {
+  var targetBook = bibleData.books[currentBook] || bibleData.books[0];
+  var nextChap = currentChap + dir;
+  if(nextChap >= 0 && nextChap < targetBook.chapters.length) {
+    currentChap = nextChap;
+    document.getElementById('sel-chapter').value = currentChap;
+    buildVersesSelector(); renderChapter();
+  } else if (dir > 0 && (currentBook + 1) < bibleData.books.length) {
+    currentBook++; currentChap = 0; buildSelects(); renderChapter();
+  } else if (dir < 0 && currentBook > 0) {
+    currentBook--; var prevBook = bibleData.books[currentBook]; currentChap = prevBook.chapters.length - 1; buildSelects(); renderChapter();
+  }
+}
+
+function renderChapter(highlightIdx){
+  var targetBook = bibleData.books[currentBook] || bibleData.books[0];
+  var chap = targetBook.chapters[currentChap] || targetBook.chapters[0];
+  document.getElementById('reader-title').textContent = targetBook.name + ' ' + (currentChap+1);
+  var html='', favs=getFavs();
+  if(!chap || !chap.verses || !chap.verses.length) {
+    document.getElementById('reader-body').innerHTML = '<p style="padding:20px; opacity:0.6;">Capítulo sem indexação válida de versículos.</p>'; return;
+  }
+  chap.verses.forEach(function(v,i){
+    var key = currentBook+'_'+currentChap+'_'+i;
+    html += '<div class="verse-block" id="v-'+i+'"><span class="verse-num">'+(i+1)+'</span><span class="verse-text">'+v+'</span><button onclick="toggleFav(\''+key+'\')" style="background:none; color:'+(favs[key]?'var(--gold-text)':'rgba(255,255,255,0.2)')+'; font-size:20px; padding:0 5px;">'+(favs[key]?'❤️':'🤍')+'</button></div>';
+  });
+  document.getElementById('reader-body').innerHTML = html;
+  if(highlightIdx !== undefined) setTimeout(function(){ document.getElementById('v-'+highlightIdx).scrollIntoView({behavior:'smooth', block:'center'}); }, 300);
+  saveHistory();
+}
+
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('content-area').scrollTop = 0;
+  if(id === 'section-reader') renderChapter();
+}
+
+function doSearch(){
+  var query = document.getElementById('search-input').value.trim().toLowerCase(); if(query.length < 2) return;
+  showSection('section-search'); var html = '', found=0; var regex = new RegExp('(' + query + ')', 'gi');
+  bibleData.books.forEach(function(b,bi){ b.chapters.forEach(function(c,ci){ c.verses.forEach(function(v,vi){
+    if(v.toLowerCase().includes(query)){
+      found++; var highlight = v.replace(regex, '<mark style="background:#ffd700; color:#000; font-weight:bold; padding:0 2px;">$1</mark>');
+      html += '<div class="card" onclick="goToVerse('+bi+','+ci+','+vi+')"><b>'+b.name+' '+(ci+1)+':'+(vi+1)+'</b><p style="font-size:14px; margin-top:5px;">'+highlight+'</p></div>';
+    }
+  }); }); });
+  document.getElementById('search-results').innerHTML = found ? html : '<p>Nenhum termo correspondente encontrado.</p>';
+}
+function goToVerse(b,c,v){ currentBook=b; currentChap=c; buildSelects(); document.getElementById('sel-chapter').value=c; buildVersesSelector(); showSection('section-reader'); setTimeout(function(){ renderChapter(v); }, 150); closeSearch(); }
+
+function toggleFav(key){
+  var f=getFavs();
+  if(f[key]) delete f[key];
+  else {
+    var p=key.split('_'); var bNode = bibleData.books[p[0]];
+    if(bNode && bNode.chapters[p[1]]) { f[key] = { ref: bNode.name+' '+(parseInt(p[1])+1)+':'+(parseInt(p[2])+1), text: bNode.chapters[p[1]].verses[p[2]], b:p[0], c:p[1], v:p[2] }; }
+  }
+  localStorage.setItem(KEY_FAV, JSON.stringify(f)); renderChapter();
+}
+function getFavs(){ return JSON.parse(localStorage.getItem(KEY_FAV)||'{}'); }
+
+function showFavorites(){
+  showSection('section-favs');
+  var f=getFavs(), html='';
+  Object.keys(f).forEach(function(k){
+    var safeText = f[k].text.replace(/'/g, "\\'");
+    html += '<div class="card"><b>'+f[k].ref+'</b><p style="font-size:14px; margin:10px 0;">'+f[k].text+'</p><div class="fav-actions">'+
+            '<button class="action-btn" onclick="goToVerse('+f[k].b+','+f[k].c+','+f[k].v+')">📖 Ler</button>'+
+            '<button class="action-btn" onclick="shareCrossBrowser(\''+f[k].ref+'\', \''+safeText+'\')">📤 Enviar</button>'+
+            '<button class="action-btn" onclick="toggleFav(\''+k+'\'); showFavorites();">🗑️ Remover</button></div></div>';
+  });
+  document.getElementById('favs-list').innerHTML = html || '<p>Sua lista de favoritos está vazia.</p>';
+}
+
+function shareCrossBrowser(ref, text) {
+  var fullText = ref + "\n" + text + "\n\nOferecido por Zapia AI & @miliumfatos";
+  if (navigator.share) { navigator.share({ text: fullText }).catch(function() { copyFallback(fullText); }); } 
+  else { copyFallback(fullText); }
+}
+function copyFallback(txt) {
+  var area = document.createElement("textarea"); area.value = txt; document.body.appendChild(area); area.select(); document.execCommand("copy"); document.body.removeChild(area);
+  openInteractiveAlert('blue', 'Área de Transferência', 'Versículo copiado com sucesso!', null, null, false);
+}
+
+function saveHistory(){
+  if(!bibleData || !bibleData.books[currentBook]) return;
+  var h = JSON.parse(localStorage.getItem(KEY_HISTORY)||'[]'); var ref = bibleData.books[currentBook].name+' '+(currentChap+1);
+  if(h.length && h[0].ref === ref) return;
+  h.unshift({ref: ref, b: currentBook, c: currentChap, ts: Date.now()});
+  localStorage.setItem(KEY_HISTORY, JSON.stringify(h.slice(0,15)));
+}
+function showHistorySection(){
+  showSection('section-history');
+  var h = JSON.parse(localStorage.getItem(KEY_HISTORY)||'[]'), html='';
+  h.forEach(function(item){ html += '<div class="card" onclick="goToVerse('+item.b+','+item.c+',0)"><b>'+item.ref+'</b><br><small style="opacity:0.6;">Acessado em: '+new Date(item.ts).toLocaleString()+'</small></div>'; });
+  document.getElementById('history-list').innerHTML = html || '<p>Sem histórico de leitura registrado.</p>';
+}
+
+function showDevotional(){
+  showSection('section-devotional');
+  var dev = DEVOTIONALS[Math.floor(Date.now()/86400000) % DEVOTIONALS.length];
+  document.getElementById('devotional-content').innerHTML = '<div class="card"><h3 style="color:var(--gold-text);">'+dev.ref+'</h3><p style="font-size:17px; font-style:italic; margin:12px 0; line-height:1.5;">"'+dev.txt+'"</p><p style="font-size:14px; opacity:0.9;"><b>Reflexão:</b> '+dev.refl+'</p></div>';
+}
+
+function initPlanSystem(){ if(!localStorage.getItem(KEY_PLANS)) localStorage.setItem(KEY_PLANS, JSON.stringify({p1:[], p2:[]})); }
+function getPlansData(){ return JSON.parse(localStorage.getItem(KEY_PLANS)); }
+
+function buildPlansInterface(){
+  renderPlanList('plan-container-1', 'p1', 15, 'Meta Anual - Etapa ');
+  renderPlanList('plan-container-2', 'p2', 10, 'Plano de Arrancada - Dia ');
+  refreshProgressBars();
+}
+function renderPlanList(elemId, key, total, text){
+  var div = document.getElementById(elemId); var data = getPlansData(); var html = '';
+  for(var i=1; i<=total; i++){
+    var has = (data[key] && data[key].includes(i)) ? 'checked' : '';
+    html += '<div class="plan-row"><span>' + text + i + '</span><input type="checkbox" ' + has + ' onclick="clickPlanStep(\''+key+'\','+i+')"></div>';
+  }
+  div.innerHTML = html;
+}
+function clickPlanStep(key, step){
+  var data = getPlansData(); if(!data[key]) data[key] = [];
+  var index = data[key].indexOf(step); if(index > -1) data[key].splice(index, 1); else data[key].push(step);
+  localStorage.setItem(KEY_PLANS, JSON.stringify(data)); refreshProgressBars();
+}
+function refreshProgressBars(){
+  var d = getPlansData();
+  document.getElementById('p-fill-1').style.width = Math.round(((d.p1||[]).length / 15) * 100) + '%';
+  document.getElementById('p-fill-2').style.width = Math.round(((d.p2||[]).length / 10) * 100) + '%';
+}
+
+function removeTtsEmojis(text){
+  return String(text).replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu,'').replace(/\s+/g,' ').trim();
+}
+
+/* TTS HÍBRIDO: AppMint (voz nativa Android) + navegador (Chrome) */
+var ttsBridgeCurrentId = null;
+var ttsBridgeCounter = 0;
+var ttsErrorCount = 0;
+var ttsTotalChunks = 0;
+
+function hasAppMintNativeTTS(){
+  return !!(window.WebToApk && typeof window.WebToApk.ttsSpeak === 'function');
+}
+function hasBrowserTTS(){
+  return ('speechSynthesis' in window) && typeof window.SpeechSynthesisUtterance !== 'undefined';
+}
+function initTTS(){
+  if(hasBrowserTTS()){
+    loadTTSVoices();
+    window.speechSynthesis.onvoiceschanged=loadTTSVoices;
+  }
+  if(hasAppMintNativeTTS()){
+    if(!window.__premierAppMintTtsListener){
+      window.addEventListener('appmint:tts', handleAppMintTtsEvent);
+      window.__premierAppMintTtsListener=true;
+    }
+    try{
+      if(typeof window.WebToApk.ttsWarmUp === 'function') window.WebToApk.ttsWarmUp();
+    }catch(e){ console.warn('AppMint TTS warm-up:', e); }
+  }
+  /* Reconfere depois da inicialização do runtime do APK. */
+  setTimeout(function(){
+    if(hasBrowserTTS()) loadTTSVoices();
+    if(hasAppMintNativeTTS()){
+      try{ if(typeof window.WebToApk.ttsWarmUp === 'function') window.WebToApk.ttsWarmUp(); }catch(e){}
+    }
+  },700);
+}
+function loadTTSVoices(){
+  if(hasBrowserTTS()) ttsVoices=window.speechSynthesis.getVoices()||[];
+}
+function handleAppMintTtsEvent(event){
+  var detail=event && event.detail ? event.detail : {};
+  if(detail.event==='voiceschanged'){ loadTTSVoices(); return; }
+  if(!ttsBridgeCurrentId || detail.id!==ttsBridgeCurrentId) return;
+  if(detail.event==='end' || detail.event==='error'){
+    if(detail.event==='error') ttsErrorCount++;
+    ttsBridgeCurrentId=null;
+    if(narratorOn) setTimeout(speakNextTTS,80);
+  }
+}
+function finishTTS(){
+  narratorOn=false;
+  ttsQueue=[];
+  ttsIndex=0;
+  ttsBridgeCurrentId=null;
+  ttsErrorCount=0;
+  ttsTotalChunks=0;
+  var b=document.getElementById('btn-narrator');
+  if(b) b.textContent='🔊 Áudio';
+}
+function stopTTSPlayback(){
+  /* Invalida eventos pendentes antes de cancelar o mecanismo de voz. */
+  ttsBridgeCurrentId=null;
+  try{
+    if(hasAppMintNativeTTS() && typeof window.WebToApk.ttsCancel === 'function'){
+      window.WebToApk.ttsCancel();
+    }
+  }catch(e){ console.warn('AppMint TTS cancel:', e); }
+  try{
+    if(hasBrowserTTS()) window.speechSynthesis.cancel();
+  }catch(e){ console.warn('Browser TTS cancel:', e); }
+  finishTTS();
+}
+function completeTTSQueue(){
+  var total=ttsTotalChunks;
+  var errors=ttsErrorCount;
+  finishTTS();
+  if(total>0 && errors>=total){
+    openInteractiveAlert('red','Falha na leitura','O mecanismo de voz do aparelho não conseguiu reproduzir o texto. Verifique se o serviço de Texto para fala do Android está instalado e se há uma voz em português disponível.',null,null,false);
+  }
+}
+function speakNextTTS(){
+  if(!narratorOn) return;
+  if(ttsIndex>=ttsQueue.length){ completeTTSQueue(); return; }
+
+  var chunk=ttsQueue[ttsIndex++];
+
+  /* No AppMint, usa diretamente a ponte para o sintetizador nativo Android. */
+  if(hasAppMintNativeTTS()){
+    var id='premier_tts_'+Date.now()+'_'+(++ttsBridgeCounter);
+    ttsBridgeCurrentId=id;
+    try{
+      window.WebToApk.ttsSpeak(chunk,'pt-BR',1.0,1.0,id);
+    }catch(e){
+      ttsBridgeCurrentId=null;
+      ttsErrorCount++;
+      setTimeout(speakNextTTS,100);
+    }
+    return;
+  }
+
+  /* Fora do APK, mantém a leitura padrão do navegador, como no Chrome. */
+  if(!hasBrowserTTS()){
+    ttsErrorCount++;
+    setTimeout(speakNextTTS,100);
+    return;
+  }
+  try{
+    narratorUtterance=new window.SpeechSynthesisUtterance(chunk);
+    narratorUtterance.lang='pt-BR';
+    narratorUtterance.rate=1;
+    narratorUtterance.pitch=1;
+    narratorUtterance.volume=1;
+    var pt=ttsVoices.find(function(v){return /^pt(-|_)BR/i.test(v.lang);}) || ttsVoices.find(function(v){return /^pt/i.test(v.lang);});
+    if(pt) narratorUtterance.voice=pt;
+    narratorUtterance.onend=function(){ if(narratorOn) speakNextTTS(); };
+    narratorUtterance.onerror=function(){
+      if(narratorOn){ ttsErrorCount++; setTimeout(speakNextTTS,100); }
+    };
+    window.speechSynthesis.speak(narratorUtterance);
+  }catch(e){
+    ttsErrorCount++;
+    setTimeout(speakNextTTS,100);
+  }
+}
+function startTTSQueue(chunks){
+  if(!hasAppMintNativeTTS() && !hasBrowserTTS()) return false;
+  stopTTSPlayback();
+  ttsQueue=(chunks||[]).filter(function(x){return String(x||'').trim().length>0;});
+  if(!ttsQueue.length) return false;
+  ttsIndex=0;
+  ttsErrorCount=0;
+  ttsTotalChunks=ttsQueue.length;
+  narratorOn=true;
+  var b=document.getElementById('btn-narrator');
+  if(b) b.textContent='⏹️ Parar';
+  setTimeout(speakNextTTS,120);
+  return true;
+}
+function toggleNarrator(){
+  if(narratorOn){ stopTTSPlayback(); return; }
+  if(!hasAppMintNativeTTS() && !hasBrowserTTS()){
+    openInteractiveAlert('red','Áudio indisponível','Este ambiente não disponibilizou a voz do navegador nem a ponte de TTS nativo do AppMint.',null,null,false);
+    return;
+  }
+  var txt=removeTtsEmojis(Array.from(document.querySelectorAll('.verse-text')).map(function(v){return v.innerText;}).join('. '));
+  if(!txt) return;
+  loadTTSVoices();
+  var chunks=txt.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[txt];
+  if(!startTTSQueue(chunks)){
+    openInteractiveAlert('red','Texto indisponível','Não foi possível preparar o texto desta leitura.',null,null,false);
+  }
+}
+
+/* SISTEMA TELEPROMPTER E CRONÔMETRO */
+var tpRun=false, tpSpeed=1, tpInt=null;
+function toggleEmbeddedTeleprompter(){
+  document.getElementById('embedded-chrono-bar').style.display = 'none';
+  var b = document.getElementById('embedded-tp-bar');
+  if(b.style.display === 'flex') { b.style.display = 'none'; stopTp(); } else { b.style.display = 'flex'; }
+}
+function toggleTp(){ if(tpRun) stopTp(); else { tpRun=true; document.getElementById('tp-play-btn').textContent='⏸'; tpInt=setInterval(function(){ document.getElementById('content-area').scrollTop += tpSpeed; }, 60); } }
+function stopTp(){ tpRun=false; clearInterval(tpInt); document.getElementById('tp-play-btn').textContent='▶'; }
+function tpFaster(){ tpSpeed=Math.min(8, tpSpeed+1); document.getElementById('tp-speed-label').textContent='V: '+tpSpeed; }
+function tpSlower(){ tpSpeed=Math.max(1, tpSpeed-1); document.getElementById('tp-speed-label').textContent='V: '+tpSpeed; }
+
+var chRun=false, chTime=0, chInt=null;
+function toggleEmbeddedChrono(){
+  document.getElementById('embedded-tp-bar').style.display = 'none'; stopTp();
+  var b = document.getElementById('embedded-chrono-bar');
+  b.style.display = b.style.display==='flex'?'none':'flex';
+}
+function startChrono(){ if(chRun)return; chRun=true; chInt=setInterval(function(){ chTime++; displayChrono(); }, 1000); }
+function pauseChrono(){ chRun=false; clearInterval(chInt); }
+function resetChrono(){ pauseChrono(); chTime=0; displayChrono(); }
+function displayChrono(){
+  var m=Math.floor(chTime/60), s=chTime%60;
+  document.getElementById('chrono-display').textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+}
+
+function stopNavigatorAddons(){
+  stopTp(); pauseChrono();
+  stopTTSPlayback();
+}
+
+function scrollToolbox(val) { document.getElementById('toolbox-slider').scrollLeft += val; }
+
+function openInteractiveAlert(colorStyle, title, text, onConfirm, onDeny, showTwoButtons) {
+  var modal = document.getElementById('global-alert-modal'); 
+  var box = document.getElementById('modal-box-style');
+  var container = document.getElementById('modal-actions-container');
+  
+  box.setAttribute('data-alert', colorStyle);
+  document.getElementById('modal-alert-title').textContent = title;
+  document.getElementById('modal-alert-body').innerHTML = text;
+  
+  if(showTwoButtons) {
+    container.innerHTML = `
+      <button class="modal-action-btn btn-deny-generic" onclick="closeInteractiveAlert(false)">Cancelar</button>
+      <button class="modal-action-btn btn-confirm-${colorStyle}" onclick="closeInteractiveAlert(true)">Confirmar</button>
+    `;
+  } else {
+    container.innerHTML = `
+      <button class="modal-action-btn btn-confirm-${colorStyle}" onclick="closeInteractiveAlert(true)">OK, Entendi!</button>
+    `;
+  }
+  
+  activeAlertCallback = { confirm: onConfirm, deny: onDeny }; 
+  modal.style.display = 'flex';
+}
+
+function closeInteractiveAlert(isConfirm) {
+  document.getElementById('global-alert-modal').style.display = 'none';
+  if(activeAlertCallback) {
+    if(isConfirm && typeof activeAlertCallback.confirm === 'function') activeAlertCallback.confirm();
+    if(!isConfirm && typeof activeAlertCallback.deny === 'function') activeAlertCallback.deny();
+  }
+  activeAlertCallback = null;
+}
+
+var KEY_STUDIES='M1F_PREMIER_STUDIES_V1', KEY_JESUS='M1F_PREMIER_JESUS_V1';
+var JESUS_CONTENT = [
+  {title:'O Bom Samaritano', ref:'Lucas 10:25-37', text:'“Ame o seu próximo como a si mesmo.”', prompt:'O que esta parábola ensina sobre compaixão e atitude prática?'} ,
+  {title:'O Filho Pródigo', ref:'Lucas 15:11-32', text:'“Este meu filho estava morto e voltou à vida; estava perdido e foi achado.”', prompt:'Como você entende o perdão, o retorno e a restauração nesta parábola?'} ,
+  {title:'A Ovelha Perdida', ref:'Lucas 15:3-7', text:'“Alegrem-se comigo, pois encontrei a minha ovelha perdida.”', prompt:'Que valor esta parábola mostra que cada pessoa tem?'} ,
+  {title:'O Semeador', ref:'Mateus 13:1-23', text:'“Quem tem ouvidos para ouvir, ouça.”', prompt:'Que tipo de solo representa seu momento atual?'} ,
+  {title:'A Videira Verdadeira', ref:'João 15:1-5', text:'“Permaneçam em mim, e eu permanecerei em vocês.”', prompt:'O que significa permanecer conectado a Jesus no cotidiano?'},
+  {title:'O Grão de Mostarda', ref:'Mateus 13:31-32', text:'“O Reino dos céus é como um grão de mostarda.”', prompt:'Que pequenos começos podem crescer pela fé e pela perseverança?'},
+  {title:'O Tesouro Escondido', ref:'Mateus 13:44', text:'“O Reino dos céus é como um tesouro escondido num campo.”', prompt:'O que você considera realmente valioso a ponto de reorganizar sua vida?'},
+  {title:'A Pérola de Grande Valor', ref:'Mateus 13:45-46', text:'“Encontrando uma pérola de grande valor, vendeu tudo o que tinha e a comprou.”', prompt:'Qual é o valor de uma escolha espiritual verdadeira para você?'},
+  {title:'Os Trabalhadores da Vinha', ref:'Mateus 20:1-16', text:'“Os últimos serão primeiros, e os primeiros serão últimos.”', prompt:'Como esta parábola confronta nossa ideia de merecimento e comparação?'},
+  {title:'O Servo Incompassivo', ref:'Mateus 18:21-35', text:'“Não deverias também ter compaixão do teu companheiro?”', prompt:'Existe alguém que você precisa perdoar ou tratar com mais misericórdia?'},
+  {title:'As Dez Virgens', ref:'Mateus 25:1-13', text:'“Vigiem, porque vocês não sabem o dia nem a hora.”', prompt:'Como se preparar espiritualmente sem viver dominado pela ansiedade?'},
+  {title:'Os Talentos', ref:'Mateus 25:14-30', text:'“Muito bem, servo bom e fiel!”', prompt:'Quais dons e responsabilidades você recebeu e como tem usado cada um?'},
+  {title:'A Casa sobre a Rocha', ref:'Mateus 7:24-27', text:'“Quem ouve estas minhas palavras e as pratica é como um homem prudente.”', prompt:'Que atitudes práticas mostram que sua vida está firmada em bons fundamentos?'},
+  {title:'A Rede', ref:'Mateus 13:47-50', text:'“O Reino dos céus é ainda como uma rede lançada ao mar.”', prompt:'O que esta imagem ensina sobre escolhas, discernimento e responsabilidade?'},
+  {title:'O Rico Insensato', ref:'Lucas 12:13-21', text:'“A vida de um homem não consiste na quantidade dos seus bens.”', prompt:'Como equilibrar planejamento, trabalho, gratidão e propósito?'},
+  {title:'O Fariseu e o Publicano', ref:'Lucas 18:9-14', text:'“Deus, tem misericórdia de mim, que sou pecador.”', prompt:'O que a humildade muda na forma como oramos e tratamos as pessoas?'},
+  {title:'O Sal da Terra e a Luz do Mundo', ref:'Mateus 5:13-16', text:'“Vocês são o sal da terra e a luz do mundo.”', prompt:'Como suas atitudes podem levar esperança e fazer diferença ao seu redor?'},
+  {title:'As Bem-aventuranças', ref:'Mateus 5:1-12', text:'“Felizes os que promovem a paz, pois serão chamados filhos de Deus.”', prompt:'Qual bem-aventurança mais conversa com o seu momento atual?'},
+  {title:'Amar os Inimigos', ref:'Mateus 5:43-48', text:'“Amem os seus inimigos e orem por aqueles que perseguem vocês.”', prompt:'Como o amor pode interromper ciclos de mágoa e revidação?'},
+  {title:'Não Julgar', ref:'Mateus 7:1-5', text:'“Não julguem, para que vocês não sejam julgados.”', prompt:'Como praticar discernimento sem transformar crítica em condenação?'},
+  {title:'A Regra de Ouro', ref:'Mateus 7:12', text:'“Façam aos outros o que vocês querem que eles façam a vocês.”', prompt:'Que atitude concreta você pode praticar hoje com alguém próximo?'},
+  {title:'Venham a Mim', ref:'Mateus 11:28-30', text:'“Venham a mim todos os que estão cansados e sobrecarregados.”', prompt:'O que você precisa entregar e que descanso busca encontrar?'},
+  {title:'O Caminho, a Verdade e a Vida', ref:'João 14:6', text:'“Eu sou o caminho, a verdade e a vida.”', prompt:'Como essa palavra orienta suas escolhas e seu modo de viver?'},
+  {title:'A Paz de Jesus', ref:'João 14:27', text:'“Deixo a vocês a paz; a minha paz dou a vocês.”', prompt:'Qual é a diferença entre paz interior e ausência de problemas?'},
+  {title:'O Maior Mandamento', ref:'Mateus 22:37-40', text:'“Ame o Senhor, o seu Deus, e ame o seu próximo como a si mesmo.”', prompt:'Como equilibrar espiritualidade, cuidado pessoal e amor ao próximo?'}
+];
+function getStudies(){ try{return JSON.parse(localStorage.getItem(KEY_STUDIES)||'[]');}catch(e){return [];} }
+function showStudySection(){ showSection('section-studies'); renderStudyList(); }
+function saveStudyNote(){
+  var title=document.getElementById('study-title').value.trim() || 'Estudo sem título';
+  var note=document.getElementById('study-note').value.trim();
+  if(!note){ openInteractiveAlert('red','Anotação vazia','Escreva alguma coisa antes de gravar.',null,null,false); return; }
+  openInteractiveAlert('green','Gravar anotação?','Deseja guardar esta anotação na base local do aplicativo?',function(){
+    var list=getStudies(); list.unshift({id:Date.now(),title:title,note:note,date:new Date().toLocaleString('pt-BR')});
+    localStorage.setItem(KEY_STUDIES,JSON.stringify(list));
+    document.getElementById('study-title').value=''; document.getElementById('study-note').value=''; renderStudyList();
+  },null,true);
+}
+function cancelStudyNote(){
+  openInteractiveAlert('red','Cancelar anotação?','O texto que ainda não foi gravado será apagado.',function(){
+    document.getElementById('study-title').value=''; document.getElementById('study-note').value='';
+  },null,true);
+}
+function deleteStudy(id){
+  openInteractiveAlert('red','Apagar anotação?','Esta ação não poderá ser desfeita.',function(){
+    localStorage.setItem(KEY_STUDIES,JSON.stringify(getStudies().filter(function(x){return x.id!==id;}))); renderStudyList();
+  },null,true);
+}
+function renderStudyList(){
+  var list=getStudies(), el=document.getElementById('study-list');
+  if(!list.length){el.innerHTML='<p class="empty-state">Nenhuma anotação gravada ainda.</p>';return;}
+  el.innerHTML=list.map(function(x){return '<div class="study-card"><h4>'+escapeHtml(x.title)+'</h4><div class="study-date">'+x.date+'</div><div class="handwriting" style="white-space:pre-wrap;">'+escapeHtml(x.note)+'</div><button class="neon-action danger" style="margin-top:10px;" onclick="deleteStudy('+x.id+')">🗑️ Apagar</button></div>';}).join('');
+}
+function showJesusSection(){ showSection('section-jesus'); renderJesusList(); }
+function getJesusComments(){ try{return JSON.parse(localStorage.getItem(KEY_JESUS)||'{}');}catch(e){return {};} }
+function saveJesusComment(i){
+  var val=document.getElementById('jesus-comment-'+i).value.trim();
+  if(!val){openInteractiveAlert('red','Comentário vazio','Escreva seu entendimento antes de gravar.',null,null,false);return;}
+  openInteractiveAlert('green','Gravar entendimento?','Deseja salvar este comentário na base local?',function(){var x=getJesusComments();x[i]={text:val,date:new Date().toLocaleString('pt-BR')};localStorage.setItem(KEY_JESUS,JSON.stringify(x));renderJesusList();},null,true);
+}
+function cancelJesusComment(i){openInteractiveAlert('red','Cancelar comentário?','O texto ainda não gravado será apagado.',function(){document.getElementById('jesus-comment-'+i).value='';},null,true);}
+function deleteJesusComment(i){openInteractiveAlert('red','Apagar comentário?','Esta ação não poderá ser desfeita.',function(){var x=getJesusComments();delete x[i];localStorage.setItem(KEY_JESUS,JSON.stringify(x));renderJesusList();},null,true);}
+function pararJesusTTS(){
+  stopTTSPlayback();
+  openInteractiveAlert('blue','Áudio desligado','A leitura de voz foi interrompida.',null,null,false);
+}
+
+function speakNativeJesus(i){
+  var text=removeTtsEmojis(JESUS_CONTENT[i].title+'. '+JESUS_CONTENT[i].text+'. '+JESUS_CONTENT[i].prompt);
+  if(!startTTSQueue([text])){
+    openInteractiveAlert('red','TTS indisponível','Este ambiente não disponibilizou o sintetizador de voz do navegador nem o TTS nativo do AppMint.',null,null,false);
+  }
+}
+function renderJesusList(){
+  var c=getJesusComments(), el=document.getElementById('jesus-list');
+  el.innerHTML=JESUS_CONTENT.map(function(x,i){var old=c[i]||{};return '<div class="study-card"><h4>'+x.title+'</h4><div style="color:var(--gold-text);font-weight:bold;">'+x.ref+'</div><p style="font-size:18px;font-style:italic;margin:12px 0;">'+x.text+'</p><p style="opacity:.85;margin-bottom:10px;"><b>Para refletir:</b> '+x.prompt+'</p><div class="study-toolbar"><button class="neon-action" onclick="speakNativeJesus('+i+')">🔊 Ler com TTS</button><button class="neon-action danger" onclick="pararJesusTTS()">⏹ Desligar áudio</button></div><textarea id="jesus-comment-'+i+'" class="comment-box" placeholder="Escreva aqui seu comentário e entendimento...">'+escapeHtml(old.text||'')+'</textarea><div class="study-toolbar" style="margin-top:10px;"><button class="neon-action" onclick="saveJesusComment('+i+')">💾 Gravar</button><button class="neon-action danger" onclick="cancelJesusComment('+i+')">❌ Cancelar</button>'+(old.text?'<button class="neon-action danger" onclick="deleteJesusComment('+i+')">🗑️ Apagar</button>':'')+'</div>'+(old.date?'<div class="study-date">Gravado em '+old.date+'</div>':'')+'</div>';}).join('');
+}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+
+function showFullManual() {
+  var textoManual = `
+    <b>1. IMPORTAÇÃO E COMPATIBILIDADE:</b><br>
+    Carregue arquivos bíblicos estruturados em formato (.json) no botão inicial. O interpretador aceita arranjos complexos e adapta os nomes de livros automaticamente para o indexador superior.<br><br>
+    
+    <b>2. CONTROLES DE LEITURA E ROLAGEM AUTOMÁTICA:</b><br>
+    • Ative o recurso <b>"Scroll"</b> para abrir o Teleprompter embutido no centro do rodapé.<br>
+    • Use a tartaruga 🐢 para diminuir e a lebre 🐇 para acelerar a velocidade de descida.<br><br>
+    
+    <b>3. CRONOMETRAGEM DE ESTUDOS:</b><br>
+    • Acione o recurso <b>"Tempo"</b> para gerenciar o marcador progressivo.<br>
+    • Controle o início, pausa e reinicialização diretamente pelo painel centralizado, sem estourar o layout lateral.<br><br>
+    
+    <b>4. SISTEMA DE AUDIO NARRADOR:</b><br>
+    • O botão <b>"Áudio"</b> sintetiza os versículos da tela em voz ativa em português (pt-BR). Pressione "Parar" a qualquer momento para cessar imediatamente.<br><br>
+    
+    <b>5. PERSONALIZAÇÃO DE AMBIENTE:</b><br>
+    • Altere o tamanho da fonte através dos seletores <b>A-</b> e <b>A+</b>.<br>
+    • Deslize o menu de ferramentas para acessar os círculos cromáticos de temas rápidos: <i>Madeira Premium, Vermelho Neon, Azul Royal, Monocromático ou Pergaminho Antigo</i>.
+  `;
+  openInteractiveAlert('blue', '📖 Manual de Operações Premier', textoManual, null, null, false);
+}
+
+function clearTemporaryData(){
+  openInteractiveAlert('red','Limpar cache do app?','Serão removidos histórico, dados temporários e caches do navegador. Bíblia, favoritos, estudos, comentários e planos serão preservados.',function(){
+    localStorage.removeItem(KEY_HISTORY);
+    sessionStorage.clear();
+    if('caches' in window){ caches.keys().then(function(keys){ keys.forEach(function(k){ caches.delete(k); }); }); }
+    openInteractiveAlert('green','Cache limpo','Os dados temporários foram removidos. Seus estudos e favoritos continuam salvos.',null,null,false);
+  },null,true);
+}
+
+function triggerResetSystem() {
+  openInteractiveAlert('red', '⚠️ Reset Global de Fábrica', 'Deseja apagar permanentemente todas as configurações e históricos?', function(){ localStorage.clear(); location.reload(); }, null, true);
+}
+
+function openAboutModal() { document.getElementById('modal-about').style.display = 'flex'; }
+function startClock(){ setInterval(function(){ var now = new Date(); document.getElementById('hclock').innerHTML = now.toLocaleDateString('pt-BR') + '<br>' + now.toLocaleTimeString('pt-BR'); }, 1000); }
+function setTheme(t){ document.body.setAttribute('data-theme', t); localStorage.setItem(KEY_THEME, t); }
+function toggleSearch(){ var b=document.getElementById('search-bar'); b.style.display=b.style.display==='flex'?'none':'flex'; if(b.style.display==='flex')document.getElementById('search-input').focus(); }
+function closeSearch(){ document.getElementById('search-bar').style.display='none'; showSection('section-reader'); }
+function changeFontSize(d){ var s=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--font-size')), n=Math.max(14,Math.min(26,s+d)); document.documentElement.style.setProperty('--font-size',n+'px'); }
+function scrollToTop(){ document.getElementById('content-area').scrollTo({top:0, behavior:'smooth'}); }
+</script>
+</body>
+</html>
